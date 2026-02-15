@@ -43,9 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroText = document.getElementById('heroText');
 
     const scenes = [
-        { title: "无界视野，始于远见", desc: "高清远用区，还原阿尔卑斯山脉般的纯净视野。" },
-        { title: "流转自如，专注当下", desc: "独家像差优化技术，拓宽 40% 中距离办公视野。" },
-        { title: "微观世界，纤毫毕现", desc: "无畸变近用区，让阅读与数字生活重归清晰。" }
+        { title: "1...", desc: "。。。。。。" },
+        { title: "2...", desc: "。。。。。。" },
+        { title: "3...", desc: "。。。。。。" }
     ];
 
     window.addEventListener('scroll', () => {
