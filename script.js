@@ -1,109 +1,66 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 搜索栏交互逻辑 
-    const searchBtn = document.getElementById('searchBtn');
-    const closeSearch = document.getElementById('closeSearch');
-    const searchContainer = document.getElementById('searchContainer');
-    const navItems = document.getElementById('navItems');
-    const navActions = document.getElementById('navActions');
-    const navLogo = document.getElementById('navLogo');
-    const searchInput = document.getElementById('searchInput');
-
-    searchBtn.addEventListener('click', () => {
-        //显示搜索栏
-        searchContainer.classList.add('active');
-        
-        //隐藏其他所有导航元素
-        navItems.classList.add('fade-hidden');
-        navActions.classList.add('fade-hidden');
-        navLogo.classList.add('fade-hidden');
-
-        setTimeout(() => searchInput.focus(), 100);
-    });
-
-    closeSearch.addEventListener('click', () => {
-        //隐藏搜索栏
-        searchContainer.classList.remove('active');
-        
-        //恢复其他元素
-        navItems.classList.remove('fade-hidden');
-        navActions.classList.remove('fade-hidden');
-        navLogo.classList.remove('fade-hidden');
-        
-        searchInput.value = ''; 
-    });
-
-    //Scrollytelling 
-    const scrollySection = document.getElementById('scrollySection');
-    const layerDist = document.getElementById('layer-distance');
-    const layerInter = document.getElementById('layer-intermediate');
-    const layerNear = document.getElementById('layer-near');
     
-    const heroTitle = document.getElementById('heroTitle');
-    const heroDesc = document.getElementById('heroDesc');
-    const heroText = document.getElementById('heroText');
+    //顶部导航的物理响应机制
+    const header = document.querySelector('.nav-header');
+    
+    const handleScroll = () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    //模态框状态管理，保留引擎以备特定深层内容使用
+    const modalOverlay = document.getElementById('globalModal');
+    const modalBody = document.getElementById('modalBody');
+    const closeBtn = document.querySelector('.modal-close');
+    
+    const modalData = {
+    };
 
-    const scenes = [
-        { title: "1...", desc: "。。。。。。" },
-        { title: "2...", desc: "。。。。。。" },
-        { title: "3...", desc: "。。。。。。" }
-    ];
+    const openModal = (targetKey) => {
+        const data = modalData[targetKey];
+        if (data) {
+            modalBody.innerHTML = `<h3>${data.title}</h3>${data.content}`;
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+    };
 
-    window.addEventListener('scroll', () => {
-        const sectionTop = scrollySection.offsetTop;
-        const sectionHeight = scrollySection.offsetHeight;
-        const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
+    const closeModal = () => {
+        if(modalOverlay) {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    };
 
-        if (scrollY >= 0 && scrollY <= sectionHeight) {
-            let progress = scrollY / (sectionHeight - windowHeight);
-            progress = Math.max(0, Math.min(1, progress)); 
-
-            if (progress < 0.3) {
-                //远景
-                layerDist.style.opacity = 1;
-                layerInter.style.opacity = 0;
-                layerNear.style.opacity = 0;
-                updateText(0);
-                layerDist.style.transform = `scale(${1 + progress * 0.2})`;
-
-            } else if (progress >= 0.3 && progress < 0.6) {
-                // 中景过渡
-                const localProgress = (progress - 0.3) / 0.3; 
-                layerDist.style.opacity = 1 - localProgress; 
-                layerInter.style.opacity = localProgress;    
-                layerNear.style.opacity = 0;
-                updateText(1);
-                const blurAmount = (1 - localProgress) * 5; 
-                layerInter.style.filter = `blur(${blurAmount}px)`;
-                layerInter.style.transform = `scale(1)`;
-
-            } else {
-                //近景过渡
-                const localProgress = (progress - 0.6) / 0.4;
-                layerInter.style.opacity = 1 - localProgress;
-                layerNear.style.opacity = localProgress;
-                updateText(2);
-                layerNear.style.transform = `scale(${1.2 - localProgress * 0.2})`;
-            }
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-modal-target]');
+        if (trigger) {
+            e.preventDefault();
+            const target = trigger.getAttribute('data-modal-target');
+            openModal(target);
         }
     });
 
-    let currentSceneIndex = 0;
-    function updateText(index) {
-        if (currentSceneIndex !== index) {
-            currentSceneIndex = index;
-            heroText.style.opacity = 0;
-            heroText.style.transform = "translateY(10px)";
-            
-            setTimeout(() => {
-                heroTitle.innerText = scenes[index].title;
-                heroDesc.innerText = scenes[index].desc;
-                heroText.style.opacity = 1;
-                heroText.style.transform = "translateY(0)";
-            }, 300);
-        }
-        if(heroText.style.opacity == '') heroText.classList.add('active');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
     }
     
-    heroText.classList.add('active');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+    }
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
+            closeModal();
+        }
+    });
 });
