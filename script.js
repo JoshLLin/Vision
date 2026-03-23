@@ -1,18 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    //顶部导航的物理响应机制
     const header = document.querySelector('.nav-header');
+    const backToTopBtn = document.getElementById('back-to-top'); // 获取回到顶部按钮
     
     const handleScroll = () => {
+        // 导航栏滚动逻辑
         if (window.scrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
+
+        // 回到顶部按钮显示/隐藏逻辑 
+        if (backToTopBtn) {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }
     };
     
     window.addEventListener('scroll', handleScroll);
-    
+
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' 
+            });
+        });
+    }
+
     //模态框状态管理，保留引擎以备特定深层内容使用
     const modalOverlay = document.getElementById('globalModal');
     const modalBody = document.getElementById('modalBody');
